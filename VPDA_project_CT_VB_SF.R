@@ -13,4 +13,8 @@ i <- ggplot(data = imigration) + geom_point(mapping = aes(x = Anos, y = Total))
 ggplot(mapping = aes(x = Anos, y = Total)) + 
   geom_point(data = emigration, color='darkgreen') +
   geom_point(data = imigration, color = 'orange') +
-  theme_minimal()
+  geom_line(data=emigration)+
+  labs(title = "Emigration and imigration throughout the years in Portugal") +
+  labs(subtitle = paste( "printed in:" , today() ) )
+  
+
