@@ -140,7 +140,7 @@ imigration2 <- imigration[,c(-2,-15)]
 diffs <- emigration2 - imigration2
 diffs <- mutate(diffs, Anos=emigration$Anos)
 
-data1 <- melt(heatmap_em, id=c("Anos"))
+data1 <- melt(diffs, id=c("Anos"))
 plot1 <- ggplot(data1, aes(variable, Anos, fill=value)) + geom_tile() + 
   xlab("Idades") +
   ylab("Anos") +
