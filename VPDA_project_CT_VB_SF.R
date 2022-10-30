@@ -5,16 +5,149 @@ library(tidyverse)
 emigration <- read_csv2("emigration.csv") 
 imigration <- read_csv2("imigration.csv") 
 
+emigration <- mutate(emigration, type=replicate(14, "Emigration"))
+imigration <- mutate(imigration, type=replicate(14, "Imigration"))
+
+#Treating the File Emigration
+colnames(emigration)[colnames(emigration) == "Menos de 15"] = "MenosDe15"
+colnames(emigration)[colnames(emigration) == "15-19"] = "De15ate19"
+colnames(emigration)[colnames(emigration) == "20-24"] = "De20ate24"
+colnames(emigration)[colnames(emigration) == "25-29"] = "De25ate29"
+colnames(emigration)[colnames(emigration) == "30-34"] = "De30ate34"
+colnames(emigration)[colnames(emigration) == "35-39"] = "De35ate39"
+colnames(emigration)[colnames(emigration) == "40-44"] = "De40ate44"
+colnames(emigration)[colnames(emigration) == "45-49"] = "De45ate49"
+colnames(emigration)[colnames(emigration) == "50-54"] = "De50ate54"
+colnames(emigration)[colnames(emigration) == "55-59"] = "De55ate59"
+colnames(emigration)[colnames(emigration) == "60-64"] = "De60ate64"
+colnames(emigration)[colnames(emigration) == "65 ou mais"] = "De65ouMais"
+
+
+
+emigration <- mutate(emigration, Total=gsub(" ", "", emigration$Total, fixed = TRUE))
+emigration <- mutate(emigration, Total=as.numeric(gsub(" ", "", emigration$Total, fixed = TRUE)))
+emigration <- mutate(emigration, MenosDe15=gsub(" ", "", emigration$MenosDe15, fixed = TRUE))
+emigration <- mutate(emigration, MenosDe15=as.numeric(gsub(" ", "", emigration$MenosDe15, fixed = TRUE)))
+emigration <- mutate(emigration, De15ate19=gsub(" ", "", emigration$De15ate19, fixed = TRUE))
+emigration <- mutate(emigration, De15ate19=as.numeric(gsub(" ", "", emigration$De15ate19, fixed = TRUE)))
+emigration <- mutate(emigration, De20ate24=gsub(" ", "", emigration$De20ate24, fixed = TRUE))
+emigration <- mutate(emigration, De20ate24=as.numeric(gsub(" ", "", emigration$De20ate24, fixed = TRUE)))
+emigration <- mutate(emigration, De25ate29=gsub(" ", "", emigration$De25ate29, fixed = TRUE))
+emigration <- mutate(emigration, De25ate29=as.numeric(gsub(" ", "", emigration$De25ate29, fixed = TRUE)))
+emigration <- mutate(emigration, De30ate34=gsub(" ", "", emigration$De30ate34, fixed = TRUE))
+emigration <- mutate(emigration, De30ate34=as.numeric(gsub(" ", "", emigration$De30ate34, fixed = TRUE)))
+emigration <- mutate(emigration, De35ate39=gsub(" ", "", emigration$De35ate39, fixed = TRUE))
+emigration <- mutate(emigration, De35ate39=as.numeric(gsub(" ", "", emigration$De35ate39, fixed = TRUE)))
+emigration <- mutate(emigration, De40ate44=gsub(" ", "", emigration$De40ate44, fixed = TRUE))
+emigration <- mutate(emigration, De40ate44=as.numeric(gsub(" ", "", emigration$De40ate44, fixed = TRUE)))
+emigration <- mutate(emigration, De45ate49=gsub(" ", "", emigration$De45ate49, fixed = TRUE))
+emigration <- mutate(emigration, De45ate49=as.numeric(gsub(" ", "", emigration$De45ate49, fixed = TRUE)))
+emigration <- mutate(emigration, De50ate54=gsub(" ", "", emigration$De50ate54, fixed = TRUE))
+emigration <- mutate(emigration, De50ate54=as.numeric(gsub(" ", "", emigration$De50ate54, fixed = TRUE)))
+emigration <- mutate(emigration, De55ate59=gsub(" ", "", emigration$De55ate59, fixed = TRUE))
+emigration <- mutate(emigration, De55ate59=as.numeric(gsub(" ", "", emigration$De55ate59, fixed = TRUE)))
+emigration <- mutate(emigration, De65ouMais=gsub(" ", "", emigration$De65ouMais, fixed = TRUE))
+emigration <- mutate(emigration, De65ouMais=as.numeric(gsub(" ", "", emigration$De65ouMais, fixed = TRUE)))
+
+
+
+#Treating the File Imigration
+colnames(imigration)[colnames(imigration) == "Menos de 15"] = "MenosDe15"
+colnames(imigration)[colnames(imigration) == "15-19"] = "De15ate19"
+colnames(imigration)[colnames(imigration) == "20-24"] = "De20ate24"
+colnames(imigration)[colnames(imigration) == "25-29"] = "De25ate29"
+colnames(imigration)[colnames(imigration) == "30-34"] = "De30ate34"
+colnames(imigration)[colnames(imigration) == "35-39"] = "De35ate39"
+colnames(imigration)[colnames(imigration) == "40-44"] = "De40ate44"
+colnames(imigration)[colnames(imigration) == "45-49"] = "De45ate49"
+colnames(imigration)[colnames(imigration) == "50-54"] = "De50ate54"
+colnames(imigration)[colnames(imigration) == "55-59"] = "De55ate59"
+colnames(imigration)[colnames(imigration) == "60-64"] = "De60ate64"
+colnames(imigration)[colnames(imigration) == "65 ou mais"] = "De65ouMais"
+
+
+
+imigration <- mutate(imigration, Total=gsub(" ", "", imigration$Total, fixed = TRUE))
+imigration <- mutate(imigration, Total=as.numeric(gsub(" ", "", imigration$Total, fixed = TRUE)))
+imigration <- mutate(imigration, MenosDe15=gsub(" ", "", imigration$MenosDe15, fixed = TRUE))
+imigration <- mutate(imigration, MenosDe15=as.numeric(gsub(" ", "", imigration$MenosDe15, fixed = TRUE)))
+imigration <- mutate(imigration, De15ate19=gsub(" ", "", imigration$De15ate19, fixed = TRUE))
+imigration <- mutate(imigration, De15ate19=as.numeric(gsub(" ", "", imigration$De15ate19, fixed = TRUE)))
+imigration <- mutate(imigration, De20ate24=gsub(" ", "", imigration$De20ate24, fixed = TRUE))
+imigration <- mutate(imigration, De20ate24=as.numeric(gsub(" ", "", imigration$De20ate24, fixed = TRUE)))
+imigration <- mutate(imigration, De25ate29=gsub(" ", "", imigration$De25ate29, fixed = TRUE))
+imigration <- mutate(imigration, De25ate29=as.numeric(gsub(" ", "", imigration$De25ate29, fixed = TRUE)))
+imigration <- mutate(imigration, De30ate34=gsub(" ", "", imigration$De30ate34, fixed = TRUE))
+imigration <- mutate(imigration, De30ate34=as.numeric(gsub(" ", "", imigration$De30ate34, fixed = TRUE)))
+imigration <- mutate(imigration, De35ate39=gsub(" ", "", imigration$De35ate39, fixed = TRUE))
+imigration <- mutate(imigration, De35ate39=as.numeric(gsub(" ", "", imigration$De35ate39, fixed = TRUE)))
+imigration <- mutate(imigration, De40ate44=gsub(" ", "", imigration$De40ate44, fixed = TRUE))
+imigration <- mutate(imigration, De40ate44=as.numeric(gsub(" ", "", imigration$De40ate44, fixed = TRUE)))
+imigration <- mutate(imigration, De45ate49=gsub(" ", "", imigration$De45ate49, fixed = TRUE))
+imigration <- mutate(imigration, De45ate49=as.numeric(gsub(" ", "", imigration$De45ate49, fixed = TRUE)))
+imigration <- mutate(imigration, De50ate54=gsub(" ", "", imigration$De50ate54, fixed = TRUE))
+imigration <- mutate(imigration, De50ate54=as.numeric(gsub(" ", "", imigration$De50ate54, fixed = TRUE)))
+imigration <- mutate(imigration, De55ate59=gsub(" ", "", imigration$De55ate59, fixed = TRUE))
+imigration <- mutate(imigration, De55ate59=as.numeric(gsub(" ", "", imigration$De55ate59, fixed = TRUE)))
+imigration <- mutate(imigration, De60ate64=gsub(" ", "", imigration$De60ate64, fixed = TRUE))
+imigration <- mutate(imigration, De60ate64=as.numeric(gsub(" ", "", imigration$De60ate64, fixed = TRUE)))
+imigration <- mutate(imigration, De65ouMais=gsub(" ", "", imigration$De65ouMais, fixed = TRUE))
+imigration <- mutate(imigration, De65ouMais=as.numeric(gsub(" ", "", imigration$De65ouMais, fixed = TRUE)))
+
+total <- rbind(emigration, imigration)
 
 e <- ggplot(data = emigration) + geom_point(mapping = aes(x = Anos, y = Total))
 
 i <- ggplot(data = imigration) + geom_point(mapping = aes(x = Anos, y = Total))
 
-ggplot(mapping = aes(x = Anos, y = Total)) + 
+##NAO TEM LEGENDA
+
+ggplot(mapping = aes(x = Anos, y = Total, group=1)) + 
   geom_point(data = emigration, color='darkgreen') +
   geom_point(data = imigration, color = 'orange') +
-  geom_line(data=emigration)+
+  geom_line(data=emigration, color='darkgreen') +
+  geom_line(data=imigration, color='orange') +
+  geom_vline(xintercept=2011,colour="blue", linetype=3) + 
+  geom_vline(xintercept=2014,colour="blue", linetype=3) + 
+  geom_vline(xintercept=2020,colour="red", linetype=3) + 
+  annotate("rect", xmin = 2011, xmax = 2014, ymin = -Inf, ymax = Inf, alpha = .2, fill="blue") +
+  annotate("rect", xmin = 2020, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .2, fill="red") +
   labs(title = "Emigration and imigration throughout the years in Portugal") +
-  labs(subtitle = paste( "printed in:" , today() ) )
-  
+  labs(subtitle = paste( "printed in:" , Sys.Date() ) ) +
+  labs(fill = "Tipo de fluxo")
+
+
+## ESTE É O GRAFICO COM LEGENDAS
+
+ggplot(total, aes(x = Anos)) + 
+  geom_point(aes(y=Total, color = factor( type))) +
+  geom_line(aes(y=Total, color = factor( type))) +
+  geom_vline(xintercept=2011,colour="blue", linetype=3) + 
+  geom_vline(xintercept=2014,colour="blue", linetype=3) + 
+  geom_vline(xintercept=2020,colour="red", linetype=3) + 
+  annotate("rect", xmin = 2011, xmax = 2014, ymin = -Inf, ymax = Inf, alpha = .2, fill="blue") +
+  annotate("rect", xmin = 2020, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .2, fill="red") +
+  labs(title = "Emigration and imigration throughout the years in Portugal") +
+  labs(subtitle = paste( "printed in:" , Sys.Date() ) ) + 
+  ylim(3000,75000)
+
+
+imigration <- mutate(imigration, Total=gsub(" ", "", imigration$Total, fixed = TRUE))
+emigration <- mutate(emigration, Total=gsub(" ", "", emigration$Total, fixed = TRUE))
+
+emigration2 <- emigration[,c(-2,-15)]
+imigration2 <- imigration[,c(-2,-15)]
+diffs <- emigration2 - imigration2
+diffs <- mutate(diffs, Anos=emigration$Anos)
+
+data1 <- melt(heatmap_em, id=c("Anos"))
+plot1 <- ggplot(data1, aes(variable, Anos, fill=value)) + geom_tile() + 
+  xlab("Idades") +
+  ylab("Anos") +
+  ggtitle("Heatmap bla bla bla") +
+  labs(fill = "labs") +
+  scale_fill_distiller(palette = 'PiYG')
+
+plot1
+
 
