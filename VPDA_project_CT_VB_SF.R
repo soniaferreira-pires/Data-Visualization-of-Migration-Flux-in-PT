@@ -1,6 +1,7 @@
 setwd('C:/Users/Asus/Documents/FEUP/MDSE/VPD/VPDA project')
 
 library(tidyverse)
+library(reshape)
 
 emigration <- read_csv2("emigration.csv") 
 imigration <- read_csv2("imigration.csv") 
@@ -128,7 +129,12 @@ ggplot(total, aes(x = Anos)) +
   annotate("rect", xmin = 2011, xmax = 2014, ymin = -Inf, ymax = Inf, alpha = .2, fill="blue") +
   annotate("rect", xmin = 2020, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .2, fill="red") +
   labs(title = "Emigration and imigration throughout the years in Portugal") +
-  labs(subtitle = paste( "printed in:" , Sys.Date() ) ) + 
+  #labs(subtitle = paste( "printed in:" , Sys.Date() ) ) 
+  #labs(subtitle = paste("by total from 2008 to 2021"))
+  labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
+  theme(plot.title = element_text(size = 16, face = "bold", family = "Helvetica")) + # changes the size of the title
+  theme(plot.subtitle = element_text(size = 12)) +
+  theme(plot.caption = element_text(size = 7, family = "Helvetica")) +
   ylim(3000,75000)
 
 
@@ -142,12 +148,12 @@ diffs <- mutate(diffs, Anos=emigration$Anos)
 
 data1 <- melt(diffs, id=c("Anos"))
 plot1 <- ggplot(data1, aes(variable, Anos, fill=value)) + geom_tile() + 
-  xlab("Idades") +
-  ylab("Anos") +
-  ggtitle("Heatmap bla bla bla") +
-  labs(fill = "labs") +
+  xlab("Age") +
+  ylab("Years") +
+  ggtitle("Migration Flow", subtitle = "Per year, what is the migration flux of Portugal?" ) +
+  labs(fill = "Values" ) +
+  labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
   scale_fill_distiller(palette = 'PiYG')
-
 plot1
 
 
