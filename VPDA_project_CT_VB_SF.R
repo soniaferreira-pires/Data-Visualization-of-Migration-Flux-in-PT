@@ -1,13 +1,8 @@
 setwd('C:/Users/Asus/Documents/FEUP/MDSE/VPD/VPDA project')
 
 library(tidyverse)
+library(readr)
 library(reshape)
-
-emigration <- read_csv2("emigration.csv") 
-imigration <- read_csv2("imigration.csv") 
-
-emigration <- mutate(emigration, type=replicate(14, "Emigration"))
-imigration <- mutate(imigration, type=replicate(14, "Imigration"))
 
 #Treating the File Emigration
 colnames(emigration)[colnames(emigration) == "Menos de 15"] = "MenosDe15"
@@ -101,52 +96,61 @@ e <- ggplot(data = emigration) + geom_point(mapping = aes(x = Anos, y = Total))
 
 i <- ggplot(data = imigration) + geom_point(mapping = aes(x = Anos, y = Total))
 
-##NAO TEM LEGENDA
-
-ggplot(mapping = aes(x = Anos, y = Total, group=1)) + 
-  geom_point(data = emigration, color='darkgreen') +
-  geom_point(data = imigration, color = 'orange') +
-  geom_line(data=emigration, color='darkgreen') +
-  geom_line(data=imigration, color='orange') +
-  geom_vline(xintercept=2011,colour="blue", linetype=3) + 
-  geom_vline(xintercept=2014,colour="blue", linetype=3) + 
-  geom_vline(xintercept=2020,colour="red", linetype=3) + 
-  annotate("rect", xmin = 2011, xmax = 2014, ymin = -Inf, ymax = Inf, alpha = .2, fill="blue") +
-  annotate("rect", xmin = 2020, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .2, fill="red") +
-  labs(title = "Emigration and imigration throughout the years in Portugal") +
-  labs(subtitle = paste( "printed in:" , Sys.Date() ) ) +
-  labs(fill = "Tipo de fluxo")
-
 
 ## ESTE É O GRAFICO COM LEGENDAS
 
-ggplot(total, aes(x = Anos)) + 
-  geom_point(aes(y=Total, color = factor( type))) +
-  geom_line(aes(y=Total, color = factor( type))) +
+emigration2 <- emigration[,c(-15)]
+imigration2 <- imigration[,c(-15)]
+diffs <- imigration2 - emigration2
+diffs <- mutate(diffs, Anos=emigration$Anos)
+diffs <- diffs[,-c(3:15)]
+diffs <- mutate(diffs, dif=ifelse( Total >= 0, "Saldo Positivo", "Saldo Negativo" ))
+
+p <- ggplot() + 
+  geom_bar(data=diffs, aes(x=Anos, y=Total,fill = dif), stat='identity') +
+  geom_point(data=total, aes(x = Anos,y=Total, color = factor( type))) +
+  geom_line(data=total, aes(x = Anos, y=Total, color = factor( type))) +
   geom_vline(xintercept=2011,colour="blue", linetype=3) + 
   geom_vline(xintercept=2014,colour="blue", linetype=3) + 
   geom_vline(xintercept=2020,colour="red", linetype=3) + 
-  annotate("rect", xmin = 2011, xmax = 2014, ymin = -Inf, ymax = Inf, alpha = .2, fill="blue") +
-  annotate("rect", xmin = 2020, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .2, fill="red") +
+  geom_rect(data=total[1,],aes(xmin = 2011, xmax = 2014, ymin = -Inf, ymax = Inf, fill="Troika Intervention")) +
+  geom_rect(data=total[1,],aes(xmin = 2020, xmax = Inf, ymin = -Inf, ymax = Inf, fill="Covid Pandemic")) +
+  scale_fill_manual("", breaks=c("Troika Intervention","Covid Pandemic", "Saldo Positivo", "Saldo Negativo"), values = alpha(c("blue", "red","yellow","green"), 0.3)) +
   labs(title = "Emigration and imigration throughout the years in Portugal") +
-  #labs(subtitle = paste( "printed in:" , Sys.Date() ) ) 
-  #labs(subtitle = paste("by total from 2008 to 2021"))
+  guides(color = guide_legend(title = "Direction of flow")) +
+  labs(subtitle = "Effects economical and social event on population flow from 2008 to 2021" ) +
+  ylab("Number of people") + 
+  xlab("Year") + 
   labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
-  theme(plot.title = element_text(size = 16, face = "bold", family = "Helvetica")) + # changes the size of the title
-  theme(plot.subtitle = element_text(size = 12)) +
-  theme(plot.caption = element_text(size = 7, family = "Helvetica")) +
-  ylim(3000,75000)
+  theme(plot.title = element_text(size = 18, face = "bold", family = "Helvetica")) + # changes the size of the title
+  theme(plot.subtitle = element_text(size = 10)) +
+  theme(plot.caption = element_text(size = 7, family = "Helvetica"))
+
+p
 
 
-imigration <- mutate(imigration, Total=gsub(" ", "", imigration$Total, fixed = TRUE))
-emigration <- mutate(emigration, Total=gsub(" ", "", emigration$Total, fixed = TRUE))
-
-emigration2 <- emigration[,c(-2,-15)]
-imigration2 <- imigration[,c(-2,-15)]
+emigration2 <- emigration[,c(-15)]
+imigration2 <- imigration[,c(-15)]
 diffs <- emigration2 - imigration2
 diffs <- mutate(diffs, Anos=emigration$Anos)
+diffs <- diffs[,-c(3:15)]
 
-data1 <- melt(diffs, id=c("Anos"))
+
+
+
+emigration3 <- emigration[,c(-2,-15)]
+imigration3 <- imigration[,c(-2,-15)]
+diffs2 <- imigration3 - emigration3
+diffs2 <- mutate(diffs, Anos=emigration$Anos)
+
+normalize <- function(x, na.rm = TRUE) {
+  +     return((x- min(x)) /(max(x)-min(x)))
+}
+
+diffs2 <- normalize(diffs2)
+diffs2 <- mutate(diffs2, Anos=emigration$Anos)
+
+data1 <- melt(diffs2, id=c("Anos"))
 plot1 <- ggplot(data1, aes(variable, Anos, fill=value)) + geom_tile() + 
   xlab("Age") +
   ylab("Years") +
@@ -155,5 +159,7 @@ plot1 <- ggplot(data1, aes(variable, Anos, fill=value)) + geom_tile() +
   labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
   scale_fill_distiller(palette = 'PiYG')
 plot1
+
+
 
 
