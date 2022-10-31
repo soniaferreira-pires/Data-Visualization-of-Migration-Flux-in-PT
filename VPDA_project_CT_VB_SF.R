@@ -2,7 +2,7 @@ setwd('C:/Users/Asus/Documents/FEUP/MDSE/VPD/VPDA project')
 
 library(tidyverse)
 library(readr)
-library(reshape)
+library(reshape2)
 
 #Treating the File Emigration
 colnames(emigration)[colnames(emigration) == "Menos de 15"] = "MenosDe15"
@@ -136,8 +136,6 @@ diffs <- mutate(diffs, Anos=emigration$Anos)
 diffs <- diffs[,-c(3:15)]
 
 
-
-
 emigration3 <- emigration[,c(-2,-15)]
 imigration3 <- imigration[,c(-2,-15)]
 diffs2 <- imigration3 - emigration3
@@ -160,6 +158,69 @@ plot1 <- ggplot(data1, aes(variable, Anos, fill=value)) + geom_tile() +
   scale_fill_distiller(palette = 'PiYG')
 plot1
 
+
+# HEATMAP DIFERENCES
+imigration4 <- mutate(imigration, Total=gsub(" ", "", imigration$Total, fixed = TRUE))
+emigration4 <- mutate(emigration, Total=gsub(" ", "", emigration$Total, fixed = TRUE))
+
+emigration5 <- emigration[,c(-2,-15)]
+imigration5 <- imigration[,c(-2,-15)]
+diffs2 <- emigration5 - imigration5
+diffs2 <- mutate(diffs2, Anos=emigration$Anos)
+
+data2 <- melt(diffs2, id=c("Anos"))
+plot_difs <- ggplot(data2, aes(variable, Anos, fill=value)) + geom_tile() + 
+  xlab("Age") +
+  ylab("Years") +
+  ggtitle("Migration Flow", subtitle = "Per year, what is the migration flux of Portugal?" ) +
+  labs(fill = "Values" ) +
+  labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
+  scale_fill_distiller(palette = 'PiYG')
+plot_difs
+
+# HEATMAP EMIGRATION
+em <- emigration
+em <- em[,c(-2,-15)]
+em_mtl <- melt(em, id=c("Anos"))
+
+plot2 <- ggplot(em_mtl, aes(variable, Anos, fill=value)) + geom_tile() + 
+  xlab("Age") +
+  ylab("Years") +
+  ggtitle("Migration Flow", subtitle = "Per year, what is the migration flux of Portugal?" ) +
+  labs(fill = "Values" ) +
+  labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
+  scale_fill_distiller(palette = 'PiYG') 
+plot2
+
+
+# HEATMAP IMIGRATION
+im <- imigration
+im <- im[,c(-2,-15)]
+im_mtl <- melt(im, id=c("Anos"))
+im_mtl
+
+plot3 <- ggplot(im_mtl, aes(variable, Anos, fill=value)) + geom_tile() + 
+  xlab("Age") +
+  ylab("Years") +
+  ggtitle("Migration Flow", subtitle = "Per year, what is the migration flux of Portugal?" ) +
+  labs(fill = "Values" ) +
+  labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
+  scale_fill_distiller(palette = 'PiYG')
+
+plot3
+
+
+t <- total[,c(-2)]
+tmelt <- melt(t, id=c("Anos","type"))
+plot4 <- ggplot(tmelt, aes(variable, Anos, fill=value)) + geom_tile() +
+  xlab("Age") +
+  ylab("Years") +
+  ggtitle("Migration Flow", subtitle = "Per year, what is the migration flux of Portugal?" ) +
+  labs(fill = "Values" ) +
+  labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
+  scale_fill_distiller(palette = 'PiYG') +
+  facet_wrap(~type, ncol=2)
+plot4
 
 
 
