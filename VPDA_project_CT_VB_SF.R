@@ -1,8 +1,11 @@
 setwd('C:/Users/Asus/Documents/FEUP/MDSE/VPD/VPDA project')
 
+
 library(tidyverse)
 library(readr)
 library(reshape2)
+library(RColorBrewer)
+
 
 #Treating the File Emigration
 colnames(emigration)[colnames(emigration) == "Menos de 15"] = "MenosDe15"
@@ -104,27 +107,29 @@ imigration2 <- imigration[,c(-15)]
 diffs <- imigration2 - emigration2
 diffs <- mutate(diffs, Anos=emigration$Anos)
 diffs <- diffs[,-c(3:15)]
-diffs <- mutate(diffs, dif=ifelse( Total >= 0, "Saldo Positivo", "Saldo Negativo" ))
+diffs <- mutate(diffs, dif=ifelse( Total >= 0, "Positive migration balance", "Negative migration balance" ))
+
 
 p <- ggplot() + 
   geom_bar(data=diffs, aes(x=Anos, y=Total,fill = dif), stat='identity') +
-  geom_point(data=total, aes(x = Anos,y=Total, color = factor( type))) +
-  geom_line(data=total, aes(x = Anos, y=Total, color = factor( type))) +
-  geom_vline(xintercept=2011,colour="blue", linetype=3) + 
-  geom_vline(xintercept=2014,colour="blue", linetype=3) + 
-  geom_vline(xintercept=2020,colour="red", linetype=3) + 
+  geom_point(data=total, aes(x = Anos,y=Total, color = factor( type)), size = 3.5) +
+  geom_line(data=total, aes(x = Anos, y=Total, color = factor( type)), size = 1.5) +
+  geom_vline(xintercept=2011,colour="gray", linetype=3) +
+  geom_vline(xintercept=2014,colour="gray", linetype=3) +
+  geom_vline(xintercept=2020,colour="ivory", linetype=3) +
   geom_rect(data=total[1,],aes(xmin = 2011, xmax = 2014, ymin = -Inf, ymax = Inf, fill="Troika Intervention")) +
   geom_rect(data=total[1,],aes(xmin = 2020, xmax = Inf, ymin = -Inf, ymax = Inf, fill="Covid Pandemic")) +
-  scale_fill_manual("", breaks=c("Troika Intervention","Covid Pandemic", "Saldo Positivo", "Saldo Negativo"), values = alpha(c("blue", "red","yellow","green"), 0.3)) +
+  scale_fill_manual("", breaks=c("Troika Intervention","Covid Pandemic", "Positive migration balance", "Negative migration balance"), values = alpha(c("#FCECA5", "#F1CCD7", "#2E765E","#FC3C80"), 0.4)) +
   labs(title = "Emigration and imigration throughout the years in Portugal") +
   guides(color = guide_legend(title = "Direction of flow")) +
   labs(subtitle = "Effects economical and social event on population flow from 2008 to 2021" ) +
-  ylab("Number of people") + 
-  xlab("Year") + 
+  ylab("Number of people") +
+  xlab("Year") +
   labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
   theme(plot.title = element_text(size = 18, face = "bold", family = "Helvetica")) + # changes the size of the title
   theme(plot.subtitle = element_text(size = 10)) +
-  theme(plot.caption = element_text(size = 7, family = "Helvetica"))
+  theme(plot.caption = element_text(size = 7, family = "Helvetica"))+
+  theme_bw()
 
 p
 
@@ -210,6 +215,7 @@ plot3 <- ggplot(im_mtl, aes(variable, Anos, fill=value)) + geom_tile() +
 plot3
 
 
+
 t <- total[,c(-2)]
 tmelt <- melt(t, id=c("Anos","type"))
 plot4 <- ggplot(tmelt, aes(variable, Anos, fill=value)) + geom_tile() +
@@ -218,9 +224,39 @@ plot4 <- ggplot(tmelt, aes(variable, Anos, fill=value)) + geom_tile() +
   ggtitle("Migration Flow", subtitle = "Per year, what is the migration flux of Portugal?" ) +
   labs(fill = "Values" ) +
   labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
-  scale_fill_distiller(palette = 'PiYG') +
-  facet_wrap(~type, ncol=2)
+  scale_fill_distiller(palette = 'Blues', direction=+1) +
+  facet_wrap(~type, ncol=2)+
+  theme_bw()
 plot4
 
 
+library(tidyverse)
+library(ggthemes)
+library(ggHoriPlot)
+library(readr); library( ggplot2 )
+library( arules ) 
+
+nat <- read_csv2('nationalities.csv')
+
+nat_long <- tidyr::pivot_longer(nat, 2:17, names_to = 'Nationality', values_to = 'value')
+
+nat_long %>% ggplot() +
+  geom_horizon(aes(Anos, value), origin = 'min', horizonscale = 4) +
+  facet_wrap(~Nationality, ncol = 1, strip.position = 'right') +
+  scale_fill_hcl(palette = 'Peach', reverse = T) +
+  theme_few() +
+  theme(
+    panel.spacing.y=unit(0, "lines"),
+    strip.text.y = element_text(angle = 0),
+    legend.position = 'none',
+    axis.text.y = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.border = element_blank()
+  ) +
+  scale_x_continuous(
+    name = 'Years',
+    breaks=seq(from = 2008, to = 2021, by = 1),
+    labels = function(x) {x}) +
+  ggtitle('Nationalities of legal immigrants to Portugal')
 
