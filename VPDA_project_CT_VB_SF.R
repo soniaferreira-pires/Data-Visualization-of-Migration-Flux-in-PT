@@ -6,8 +6,9 @@ library(reshape2)
 library(RColorBrewer)
 library(ggthemes)
 library(ggHoriPlot)
-#library( ggplot2 )
+library( ggplot2 )
 library( arules )
+library(zoo)
 
 emigration <- read_csv2("emigration.csv") 
 imigration <- read_csv2("imigration.csv") 
@@ -55,6 +56,23 @@ emigration <- mutate(emigration, from65orMore=gsub(" ", "", emigration$from65orM
 emigration <- mutate(emigration, from65orMore=as.numeric(gsub(" ", "", emigration$from65orMore, fixed = TRUE)))
 
 
+
+colnames(emigration)[colnames(emigration) == "LessThan15"] = "< 15"
+colnames(emigration)[colnames(emigration) == "from15to19"] = "[15, 19]"
+colnames(emigration)[colnames(emigration) == "from20to24"] = "[20, 24]"
+colnames(emigration)[colnames(emigration) == "from25to29"] = "[25, 29]"
+colnames(emigration)[colnames(emigration) == "from30to34"] = "[30, 34]"
+colnames(emigration)[colnames(emigration) == "from35to39"] = "[35, 39]"
+colnames(emigration)[colnames(emigration) == "from40to44"] = "[40, 44]"
+colnames(emigration)[colnames(emigration) == "from45to49"] = "[45, 49]"
+colnames(emigration)[colnames(emigration) == "from50to54"] = "[50, 54]"
+colnames(emigration)[colnames(emigration) == "from55to59"] = "[55, 59]"
+colnames(emigration)[colnames(emigration) == "from60to64"] = "[60, 64]"
+colnames(emigration)[colnames(emigration) == "from65orMore"] = ">= 65"
+
+
+
+
 #----Treating Imigration file
 colnames(imigration)[colnames(imigration) == "Menos de 15"] = "LessThan15"
 colnames(imigration)[colnames(imigration) == "15-19"] = "from15to19"
@@ -96,6 +114,19 @@ imigration <- mutate(imigration, from60to64=as.numeric(gsub(" ", "", imigration$
 imigration <- mutate(imigration, from65orMore=gsub(" ", "", imigration$from65orMore, fixed = TRUE))
 imigration <- mutate(imigration, from65orMore=as.numeric(gsub(" ", "", imigration$from65orMore, fixed = TRUE)))
 
+colnames(imigration)[colnames(imigration) == "LessThan15"] = "< 15"
+colnames(imigration)[colnames(imigration) == "from15to19"] = "[15, 19]"
+colnames(imigration)[colnames(imigration) == "from20to24"] = "[20, 24]"
+colnames(imigration)[colnames(imigration) == "from25to29"] = "[25, 29]"
+colnames(imigration)[colnames(imigration) == "from30to34"] = "[30, 34]"
+colnames(imigration)[colnames(imigration) == "from35to39"] = "[35, 39]"
+colnames(imigration)[colnames(imigration) == "from40to44"] = "[40, 44]"
+colnames(imigration)[colnames(imigration) == "from45to49"] = "[45, 49]"
+colnames(imigration)[colnames(imigration) == "from50to54"] = "[50, 54]"
+colnames(imigration)[colnames(imigration) == "from55to59"] = "[55, 59]"
+colnames(imigration)[colnames(imigration) == "from60to64"] = "[60, 64]"
+colnames(imigration)[colnames(imigration) == "from65orMore"] = ">= 65"
+
 
 #---- Merge files into 1 table
 total <- rbind(emigration, imigration)
@@ -104,7 +135,7 @@ e <- ggplot(data = emigration) + geom_point(mapping = aes(x = Anos, y = Total))
 i <- ggplot(data = imigration) + geom_point(mapping = aes(x = Anos, y = Total))
 
 ########
-#---- PLOT 1: Emigration and imigration throughout the years in Portugal
+#---- PLOT 1: Emigration and immigration throughout the years in Portugal
 ########
 emigration2 <- emigration[,c(-15)]
 imigration2 <- imigration[,c(-15)]
@@ -121,10 +152,14 @@ p <- ggplot() +
   geom_vline(xintercept=2011,colour="gray", linetype=3) +
   geom_vline(xintercept=2014,colour="gray", linetype=3) +
   geom_vline(xintercept=2020,colour="ivory", linetype=3) +
+  scale_x_continuous(
+    name = 'Years',
+    breaks=seq(from = 2008, to = 2021, by = 1),
+    labels = function(x) {x})+
   geom_rect(data=total[1,],aes(xmin = 2011, xmax = 2014, ymin = -Inf, ymax = Inf, fill="Troika Intervention")) +
   geom_rect(data=total[1,],aes(xmin = 2020, xmax = Inf, ymin = -Inf, ymax = Inf, fill="Covid Pandemic")) +
   scale_fill_manual("", breaks=c("Troika Intervention","Covid Pandemic", "Positive migration balance", "Negative migration balance"), values = alpha(c("#FCECA5", "#F1CCD7", "#2E765E","#FC3C80"), 0.4)) +
-  labs(title = "Emigration and imigration throughout the years in Portugal") +
+  labs(title = "Emigration and immigration throughout the years in Portugal") +
   guides(color = guide_legend(title = "Direction of flow")) +
   labs(subtitle = "Effects economical and social event on population flow from 2008 to 2021" ) +
   ylab("Number of people") +
@@ -176,14 +211,19 @@ hm_imi <- imigration[,c(-2,-15)]
 
 #--Heatmap Emigration
 hme_mtl <- melt(hm_emi, id=c("Anos"))
-hm_emigrations <- ggplot(hme_mtl, aes(variable, Anos, fill=value)) + geom_tile() + 
+hm_emigrations <- ggplot(hme_mtl, aes(variable, Anos, fill=value)) + geom_tile() +
+  scale_y_continuous(
+    name = 'Years',
+    breaks=seq(from = 2008, to = 2021, by = 1),
+    labels = function(x) {x})+
   xlab("Age") +
   ylab("Years") +
   labs( title = "Emigration in Portugal") +
   labs(subtitle = "from 2008 to 2021" ) +
   labs(fill = "Values" ) +
   labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
-  scale_fill_distiller(palette = 'PiYG') 
+  scale_fill_distiller(palette = 'Blues',direction=+1)+
+  theme_bw()
 hm_emigrations
 
 #--Heatmap Imigration
@@ -197,42 +237,67 @@ hm_emigrations
 
 hmi_mtl <- melt(hm_imi, id=c("Anos"))
 hm_imigrations <- ggplot(hmi_mtl, aes(variable, Anos, fill=value)) + 
-  geom_tile() + 
+  geom_tile() +
+  scale_y_continuous(
+    name = 'Years',
+    breaks=seq(from = 2008, to = 2021, by = 1),
+    labels = function(x) {x})+
   xlab("Age") +
   ylab("Years") +
-  ggtitle("Imigration im Portugal", subtitle = "From 2008 to 2021" ) +
+  ggtitle("Immigration in Portugal", subtitle = "From 2008 to 2021" ) +
   labs(fill = "Values" ) +
   labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
-  scale_fill_distiller(palette = 'PiYG') 
+  scale_fill_distiller(palette = 'Blues', direction=+1)+
+  theme_bw()
   # axis(1, at=result_df$legend, labels=result_df$legend,cex.axis=0.6)
 hm_imigrations
 
 
-#--Heatmap calc differences btw emigration and imigration
+#--Heatmap calc differences btw emigration and immigration
+
+min_max <- function( x , new_min , new_max )
+{
+  if( missing (new_min ) ) new_min <- 0 ## set default value for the parameter
+  if( missing (new_max ) ) new_max <- 1
+  return( ( x - min(x) ) / (max( x )-min( x ) ) * ( new_max - new_min) + new_min )
+}
+
+
 hm_diffs <- hm_emi - hm_imi
+hm_diffs <- min_max(hm_diffs, -1, 1)
 hm_diffs <- mutate(hm_diffs, Anos=emigration$Anos)
+
 
 hmd_melt <- melt(hm_diffs, id=c("Anos"))
 hm_diffs <- ggplot(hmd_melt, aes(variable, Anos, fill=value)) + geom_tile() + 
+  scale_y_continuous(
+    name = 'Years',
+    breaks=seq(from = 2008, to = 2021, by = 1),
+    labels = function(x) {x})+
   xlab("Age") +
   ylab("Years") +
-  labs(title = "Migration Flow of Portugal" ) +
-  labs(subtitle = "Per year, what is the migration flux of Portugal?" ) +
+  labs(title = "Migration Balance of Portugal throughout the years" ) +
+  labs(subtitle = "Per year, what is the migration balance of Portugal between 2008 to 2021?" ) +
   labs(fill = "Values" ) +
   labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
-  scale_fill_distiller(palette = 'PiYG') 
+  scale_fill_distiller(palette = 'BrBG')+
+  theme_bw()
 hm_diffs
 
 
-#--Heatmap Emigration and Imigration
+#--Heatmap Emigration and Immigration
 
 hm_tot <- total[,c(-2)]
 hmtot_melt <- melt(hm_tot, id=c("Anos","type"))
 hm_emi_imi <- ggplot(hmtot_melt, aes(variable, Anos, fill=value)) + geom_tile() +
+  scale_y_continuous(
+    name = 'Years',
+    breaks=seq(from = 2008, to = 2021, by = 1),
+    labels = function(x) {x})+
   xlab("Age") +
   ylab("Years") +
   ggtitle("Migration Flow", subtitle = "Per year, what is the migration flux of Portugal?" ) +
-  labs(fill = "Values" ) +
+  labs(fill = "Values") +
   labs(caption = "Source: PORTDATA, @2022 \nAuthors: Cátia Teixeira, Sónia Ferreira and Vasco Bartolomeu @FEUP-MECD") +
   scale_fill_distiller(palette = 'Blues', direction=+1) +
   facet_wrap(~type, ncol=2) +
@@ -240,15 +305,48 @@ hm_emi_imi <- ggplot(hmtot_melt, aes(variable, Anos, fill=value)) + geom_tile() 
 hm_emi_imi
 
 
+
+
 #--Plot: Nationalities of legal immigrants to Portugal
 nat <- read_csv2('nationalities.csv')
 
 nat_long <- tidyr::pivot_longer(nat, 2:17, names_to = 'Nationality', values_to = 'value')
 
+africa <- c("Angola", "Cape Verde", "Guiné-Bissau", "Mozambique", "S. Tomé e Príncipe")
+europe <- c("France", "Italy", "Moldova", "Romania", "Spain", "Ukraine", "United Kingdom")
+america <- c("Brazil")
+asia <- c("India", "Nepal", "China")
+
+continent_label <- function(x) { 
+  if(x %in% africa) y <- "Africa"
+  if(x %in% europe) y <- "Europe"
+  if(x %in% america) y <- "America"
+  if(x %in% asia) y <- "Asia"
+  return(y)
+}
+
+
+
+nat_long$continent <- sapply(nat_long$Nationality, continent_label)
+
+
+# color_label <- function(x) { 
+#   if(identical(tolower(x), tolower("Africa"))) y <- "Peach"
+#   if(identical(tolower(x), tolower("Europe"))) y <- "Blues"
+#   if(identical(tolower(x), tolower("America"))) y <- "Greens"
+#   if(identical(tolower(x), tolower("Asia"))) y <- "Purples"
+#   return(y)
+# }
+# 
+
+nat_long %>%
+  arrange(continent)
+
+
 nat_long %>% ggplot() +
-  geom_horizon(aes(Anos, value), origin = 'min', horizonscale = 4) +
+  geom_horizon(mapping = aes(Anos, value), origin = 'min', horizonscale = 4) +
   facet_wrap(~Nationality, ncol = 1, strip.position = 'right') +
-  scale_fill_hcl(palette = 'Peach', reverse = T) +
+  scale_fill_hcl( palette = "Peach", reverse = T)+
   theme_few() +
   theme(
     panel.spacing.y=unit(0, "lines"),
