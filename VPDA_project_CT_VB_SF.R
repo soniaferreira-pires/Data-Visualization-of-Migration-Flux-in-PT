@@ -263,7 +263,7 @@ min_max <- function( x , new_min , new_max )
 }
 
 
-hm_diffs <- hm_emi - hm_imi
+hm_diffs <- hm_imi - hm_emi 
 hm_diffs <- min_max(hm_diffs, -1, 1)
 hm_diffs <- mutate(hm_diffs, Anos=emigration$Anos)
 
